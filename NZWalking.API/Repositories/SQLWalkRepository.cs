@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NZWalking.API.Data;
 using NZWalking.API.Models.Domain;
+using NZWalking.API.Utils;
 
 namespace NZWalking.API.Repositories
 {
@@ -13,7 +14,42 @@ namespace NZWalking.API.Repositories
             return walk;
         }
 
-        public async Task<List<Walk>> GetAllAsync() => await dbContext.Walks.Include(x => x.Difficulty).Include(x => x.Region).ToListAsync();
+        public async Task<List<Walk>> GetAllAsync(string? filterFieldName = null, string? filterValue = null, string? filterComparisonOperator = null,
+            string? sortBy = null, bool isAscending = true)
+        {
+            var walks = dbContext.Walks.Include(x => x.Difficulty).Include(x => x.Region).AsQueryable();
+            //Filtering
+            if (string.IsNullOrWhiteSpace(filterFieldName) is false && string.IsNullOrWhiteSpace(filterValue) is false)
+            {
+                if (filterFieldName.Equals(nameof(Walk.Name), StringComparison.OrdinalIgnoreCase))
+                    walks = walks.Where(x => x.Name.Contains(filterValue));
+
+                else if (string.IsNullOrWhiteSpace(filterComparisonOperator) is false)
+                {
+                    if (filterFieldName.Equals(nameof(Walk.LengthInKm), StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (Enum.TryParse(filterComparisonOperator, true, out LogicOperator logicOperator))
+                        {
+                            //select concrete strategy based on LogicOperator
+                            //walks = walks.Where(x => x.LengthInKm > double.Parse(filterValue));
+                        }
+                    }
+                }
+            }
+            //Sorting
+            if (string.IsNullOrWhiteSpace(sortBy) is false)
+            {
+                if (sortBy.Equals(nameof(Walk.Name), StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending ? walks.OrderBy(x => x.Name) : walks.OrderByDescending(x => x.Name);
+                }
+                else if (sortBy.Equals(nameof(Walk.LengthInKm), StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending ? walks.OrderBy(x => x.LengthInKm) : walks.OrderByDescending(x => x.LengthInKm);
+                }
+            }
+            return await walks.ToListAsync();
+        }
 
         public async Task<Walk?> GetByIdAsync(Guid id)
         {
@@ -30,7 +66,7 @@ namespace NZWalking.API.Repositories
             //item = walk;
             item.Name = walk.Name;
             item.Description = walk.Description;
-            item.LenghtInKm = walk.LenghtInKm;
+            item.LengthInKm = walk.LengthInKm;
             item.WalkImageUrl = walk.WalkImageUrl;
             item.DifficultyId = walk.DifficultyId;
             item.RegionId = walk.RegionId;
