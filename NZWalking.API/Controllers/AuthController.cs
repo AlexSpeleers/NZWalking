@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NZWalking.API.Models.DTO;
+using NZWalking.API.Repositories;
 
 namespace NZWalking.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController(UserManager<IdentityUser> userManager) : ControllerBase
+    public class AuthController(UserManager<IdentityUser> userManager, ITokenRepository tokenRepository) : ControllerBase
     {
         [HttpPost]
         [Route("Register")]
@@ -40,10 +41,16 @@ namespace NZWalking.API.Controllers
             IdentityUser? identityUser = await userManager.FindByEmailAsync(loginRequestDTO.UserName);
             if (identityUser is not null)
             {
-
                 var checkPasswordResult = await userManager.CheckPasswordAsync(identityUser, loginRequestDTO.Password);
                 if (checkPasswordResult)
                 {
+                    var roles = await userManager.GetRolesAsync(identityUser);
+                    if (roles is not null) 
+                    {
+                        var jwtToken = tokenRepository.CreateJWTToken(identityUser, [.. roles]);
+                        LoginResponseDTO response = new() { JWTToken = jwtToken };
+                        return Ok(response);
+                    }
                     return Ok();
                 }
             }

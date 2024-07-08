@@ -10,9 +10,7 @@ namespace NZWalking.API.Repositories
     {
         public string CreateJWTToken(IdentityUser user, List<string> roles)
         {
-            var claims = new List<Claim>();
-            claims[0].ty
-            claims.Add(new(ClaimTypes.Email, user.Email));
+            List<Claim> claims = [new(ClaimTypes.Email, user.Email)];
 
             foreach (var role in roles)
             {
