@@ -4,6 +4,7 @@ using NZWalking.API.CustomActionFilters;
 using NZWalking.API.Models.Domain;
 using NZWalking.API.Models.DTO;
 using NZWalking.API.Repositories;
+using System.Net;
 
 namespace NZWalking.API.Controllers
 {
@@ -29,6 +30,7 @@ namespace NZWalking.API.Controllers
         {
             var walksDomainModel = await walkRepository.GetAllAsync(filterFieldName, filterQuery, filterComparisonOperator,
                 sortBy, isAscending ?? true, pageNumber, pageSize);
+            throw new Exception("This is a new exception.");
             return Ok(mapper.Map<List<WalkDTO>>(walksDomainModel));
         }
         [HttpGet]
