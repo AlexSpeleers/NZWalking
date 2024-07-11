@@ -30,6 +30,7 @@ namespace NZWalking.API.Controllers
         {
             var walksDomainModel = await walkRepository.GetAllAsync(filterFieldName, filterQuery, filterComparisonOperator,
                 sortBy, isAscending ?? true, pageNumber, pageSize);
+            throw new Exception("Some issue happened.");
             return Ok(mapper.Map<List<WalkDTO>>(walksDomainModel));
         }
 

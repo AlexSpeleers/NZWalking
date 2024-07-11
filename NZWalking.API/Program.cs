@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -8,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NZWalking.API.Data;
 using NZWalking.API.Mappings;
+using NZWalking.API.Middlewares;
 using NZWalking.API.Repositories;
 using Serilog;
 using System.Text;
@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.File("Logs/NZWalks_Log.txt", rollingInterval: RollingInterval.Minute)
+    .WriteTo.File("Logs/NZWalks_Log.txt", rollingInterval: RollingInterval.Day)
     .MinimumLevel.Information()
     .CreateLogger();
 
