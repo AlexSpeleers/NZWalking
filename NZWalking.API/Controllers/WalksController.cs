@@ -30,9 +30,9 @@ namespace NZWalking.API.Controllers
         {
             var walksDomainModel = await walkRepository.GetAllAsync(filterFieldName, filterQuery, filterComparisonOperator,
                 sortBy, isAscending ?? true, pageNumber, pageSize);
-            throw new Exception("This is a new exception.");
             return Ok(mapper.Map<List<WalkDTO>>(walksDomainModel));
         }
+
         [HttpGet]
         [Route("{id:Guid}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
@@ -41,6 +41,7 @@ namespace NZWalking.API.Controllers
             if(walkDomainModel is null) return NotFound();
             return Ok(mapper.Map<WalkDTO>(walkDomainModel));
         }
+
         [HttpPut]
         [Route("{id:Guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, UpdateWalkRequestDTO updateWalkRequestDTO)
@@ -52,6 +53,7 @@ namespace NZWalking.API.Controllers
             if (walkDomainModel is null) return NotFound();
             return Ok(mapper.Map<WalkDTO>(walkDomainModel));
         }
+
         [HttpDelete]
         [Route("{id:Guid}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id) 
