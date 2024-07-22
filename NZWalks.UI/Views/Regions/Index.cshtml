@@ -11,6 +11,7 @@
             <th>Id</th>
             <th>Code</th>
             <th>Name</th>
+            <th> </th>
         </tr>
     </thead>
     <tbody>
@@ -20,6 +21,9 @@
                 <td>@walk.Id</td>
                 <td>@walk.Code</td>
                 <td>@walk.Name</td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", "Regions", new {id = walk.Id}, new {@class = "btn btn-light"})
+                </td>
             </tr>
         }
     </tbody>

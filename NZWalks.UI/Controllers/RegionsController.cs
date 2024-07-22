@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NZWalks.UI.Models;
 using NZWalks.UI.Models.DTO;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
@@ -49,6 +50,54 @@ namespace NZWalks.UI.Controllers
                 return RedirectToAction("Index", "Regions");
             }
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var client = httpClientFactory.CreateClient();
+            var reponse = await client.GetFromJsonAsync<RegionDTO>($"https://localhost:7260/api/regions/{id}");
+            if (reponse is not null)
+            {
+                return View(reponse);
+            }
+            return View(null);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(RegionDTO request)
+        {
+            var client = httpClientFactory.CreateClient();
+            var httpRequestMessage = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"https://localhost:7260/api/regions/{request.Id}"),
+                Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+            };
+            var httpResponseMessage = await client.SendAsync(httpRequestMessage);
+            httpResponseMessage.EnsureSuccessStatusCode();
+
+            var response = await httpResponseMessage.Content.ReadFromJsonAsync<RegionDTO>();
+            if (response is not null)
+                return RedirectToAction("Edit", "Regions");
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(RegionDTO request)
+        {
+            try
+            {
+                var client = httpClientFactory.CreateClient();
+                var httpResponseMessage = await client.DeleteAsync($"https://localhost:7260/api/regions/{request.Id}");
+                httpResponseMessage.EnsureSuccessStatusCode();
+                return RedirectToAction("Index", "Regions");
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return View("Edit");
         }
     }
 }
